@@ -1,4 +1,6 @@
-'use strict';
+//'use strict';
+
+var angular = require('angular');
 
 angular.module('todoListApp')
 .service('dataService', function($http){
@@ -11,7 +13,7 @@ angular.module('todoListApp')
     .then(callback);
   };
 
-  this.deleteTodo = function(todos){
+  this.deleteTodo = function(todo){
     console.log("the " + todo.name + " todo has been deleted");
   };
 
