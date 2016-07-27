@@ -4,6 +4,8 @@ var express = require('express');
 var index = require('./api/index.js');
 
 var app = express();
+require('./database');
+
 
 app.use('/', express.static('public'));
 
