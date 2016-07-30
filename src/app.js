@@ -2,6 +2,7 @@
 
 var express = require('express');
 var index = require('./api/index.js');
+var parser = require('body-parser');
 
 var app = express();
 require('./database');
@@ -9,6 +10,8 @@ require('./seed');
 
 
 app.use('/', express.static('public'));
+
+app.use(parser.json());
 
 app.use('/api', index);
 
