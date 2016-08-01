@@ -40,7 +40,9 @@ webpackJsonp([0],[
 	  });
 
 	  $scope.deleteTodo = function(todo, $index){
-	    dataService.deleteTodo(todo);
+	    if (todo._id){
+	      dataService.deleteTodo(todo)
+	    };
 	    $scope.todos.splice($index,1);
 	  };
 
@@ -51,8 +53,16 @@ webpackJsonp([0],[
 	      }
 	    });
 
-	    dataService.saveTodos(filteredEditedTodos);
-	  }
+	    dataService.saveTodos(filteredEditedTodos)
+	    .finally($scope.resetTodoState());
+	  };
+
+	//Después de guardar Todos nuevos o editados, propiedad todo.edited debe ser reseteada
+	  $scope.resetTodoState = function(){
+	    $scope.todos.forEach(function(todo){
+	      todo.edited = false;
+	    });
+	  };
 
 	  $scope.addTodo = function(){
 	    var todo = { name : "This a new todo." };
@@ -71,7 +81,7 @@ webpackJsonp([0],[
 	var angular = __webpack_require__(1);
 
 	angular.module('todoListApp')
-	.service('dataService', function($http){
+	.service('dataService', function($http, $q){
 	  this.helloConsole = function(){
 	    console.log("this is the data service");
 	  };
@@ -82,11 +92,28 @@ webpackJsonp([0],[
 	  };
 
 	  this.deleteTodo = function(todo){
-	    console.log("the " + todo.name + " todo has been deleted");
+	    $http.delete('/api/todos/' + todo._id).
+	    then(function(result){
+	      console.log("the " + todo.name + " todo has been deleted");
+	    });
 	  };
 
 	  this.saveTodos = function(todos){
-	    console.log(todos.length + " todos has been saved");
+	    var queue = [];
+	    todos.forEach(function(todo){
+	      var request;
+	      if(!todo._id){
+	        request = $http.post('/api/todos', todo);
+	      } else{
+	        request = $http.put('/api/todos/'+ todo._id, todo).then(function(result){
+	          todo = result.data.todo;
+	        });
+	      }
+	      queue.push(request);
+	    });
+	    return $q.all(queue).then(function(result){
+	      console.log("I saved " + todos.length + " todos");
+	    });
 	  };
 
 	});

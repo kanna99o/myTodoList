@@ -19,7 +19,9 @@ angular.module('todoListApp')
   });
 
   $scope.deleteTodo = function(todo, $index){
-    dataService.deleteTodo(todo);
+    if (todo._id){
+      dataService.deleteTodo(todo)
+    };
     $scope.todos.splice($index,1);
   };
 
@@ -30,8 +32,16 @@ angular.module('todoListApp')
       }
     });
 
-    dataService.saveTodos(filteredEditedTodos);
-  }
+    dataService.saveTodos(filteredEditedTodos)
+    .finally($scope.resetTodoState());
+  };
+
+//Después de guardar Todos nuevos o editados, propiedad todo.edited debe ser reseteada
+  $scope.resetTodoState = function(){
+    $scope.todos.forEach(function(todo){
+      todo.edited = false;
+    });
+  };
 
   $scope.addTodo = function(){
     var todo = { name : "This a new todo." };
